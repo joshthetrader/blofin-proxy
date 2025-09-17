@@ -27,7 +27,8 @@ func main() {
 		return func(w http.ResponseWriter, r *http.Request) {
 			// Set CORS headers
 			origin := r.Header.Get("Origin")
-			if origin != "" {
+			// Allow both HTTP and HTTPS localhost for development
+			if origin == "http://localhost:3000" || origin == "https://localhost:3000" || origin != "" {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 			} else {
 				w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -84,10 +85,10 @@ func main() {
 }
 
 func blofinProxy(w http.ResponseWriter, r *http.Request) {
-	// Keep the full path including /api prefix (BloFin expects it)
-	apiPath := r.URL.Path
+	// Strip /api prefix from path for BloFin API
+	apiPath := strings.TrimPrefix(r.URL.Path, "/api")
 	
-	// Build target URL - use full path as BloFin expects /api prefix
+	// Build target URL - BloFin API doesn't expect /api prefix
 	targetURL, err := url.Parse(BLOFIN_API_BASE + apiPath)
 	if err != nil {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
