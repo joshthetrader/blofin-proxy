@@ -47,8 +47,21 @@ func main() {
 		fmt.Fprintf(w, `{"status":"ok","timestamp":"%s"}`, time.Now().UTC().Format(time.RFC3339))
 	}))
 
-	// Blofin API proxy - handles all /api/* routes
-	http.HandleFunc("/api/", corsMiddleware(blofinProxy))
+	// Root endpoint for debugging
+	http.HandleFunc("/", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"message":"Blofin CORS Proxy","version":"1.0","endpoints":["/health","/api/*"],"timestamp":"%s"}`, time.Now().UTC().Format(time.RFC3339))
+			return
+		}
+		// Handle all /api/* routes
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			blofinProxy(w, r)
+			return
+		}
+		// 404 for other paths
+		http.NotFound(w, r)
+	}))
 
 	log.Printf("🚀 Blofin CORS Proxy starting on port %s", port)
 	log.Printf("🔗 Proxying requests to: %s", BLOFIN_API_BASE)
