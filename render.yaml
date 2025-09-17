@@ -4,7 +4,7 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     plan: starter  # Free tier
-    region: oregon
+    region: frankfurt
     buildCommand: ""
     startCommand: ""
     healthCheckPath: /health
@@ -16,3 +16,4 @@ services:
     scaling:
       minInstances: 1
       maxInstances: 1
+
