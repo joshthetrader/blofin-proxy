@@ -56,6 +56,7 @@ func main() {
 		}
 		// Handle all /api/* routes
 		if strings.HasPrefix(r.URL.Path, "/api/") {
+			log.Printf("🔍 API route detected: %s", r.URL.Path)
 			blofinProxy(w, r)
 			return
 		}
