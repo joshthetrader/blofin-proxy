@@ -60,8 +60,11 @@ func main() {
 }
 
 func blofinProxy(w http.ResponseWriter, r *http.Request) {
-	// Build target URL - preserve the full path and query parameters
-	targetURL, err := url.Parse(BLOFIN_API_BASE + r.URL.Path)
+	// Extract API path by removing /api prefix (like Netlify proxy does)
+	apiPath := strings.TrimPrefix(r.URL.Path, "/api")
+	
+	// Build target URL - use extracted path without /api prefix
+	targetURL, err := url.Parse(BLOFIN_API_BASE + apiPath)
 	if err != nil {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
@@ -121,10 +124,8 @@ func blofinProxy(w http.ResponseWriter, r *http.Request) {
 		log.Printf("❌ Failed to copy response body: %v", err)
 	}
 
-	// Optional: Log successful requests (remove in production if you want)
-	if os.Getenv("DEBUG") == "true" {
-		log.Printf("✅ %s %s -> %d", r.Method, r.URL.Path, resp.StatusCode)
-	}
+	// Log requests for debugging (like Netlify proxy)
+	log.Printf("🔗 %s %s -> %s (Status: %d)", r.Method, r.URL.Path, targetURL.String(), resp.StatusCode)
 }
 
 // HTTP hop-by-hop headers that should not be forwarded
