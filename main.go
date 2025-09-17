@@ -74,10 +74,10 @@ func main() {
 }
 
 func blofinProxy(w http.ResponseWriter, r *http.Request) {
-	// Extract API path by removing /api prefix (like Netlify proxy does)
-	apiPath := strings.TrimPrefix(r.URL.Path, "/api")
+	// Keep the full path including /api prefix (BloFin expects it)
+	apiPath := r.URL.Path
 	
-	// Build target URL - use extracted path without /api prefix
+	// Build target URL - use full path as BloFin expects /api prefix
 	targetURL, err := url.Parse(BLOFIN_API_BASE + apiPath)
 	if err != nil {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
