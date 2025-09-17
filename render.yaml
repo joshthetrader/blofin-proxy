@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: blofin-proxy
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter  # Free tier
+    region: oregon
+    buildCommand: ""
+    startCommand: ""
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000  # Render uses port 10000
+      - key: DEBUG
+        value: false
+    scaling:
+      minInstances: 1
+      maxInstances: 1
